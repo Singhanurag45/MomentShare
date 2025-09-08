@@ -63,7 +63,7 @@ const Navbar = ({ onOpenCreatePostModal }) => {
               </span>
             </button>
 
-            {/* 🔥 FIXED Notifications Wrapper */}
+         
             <div className="flex items-center space-x-1 hover:text-blue-600 cursor-pointer">
               <Notifications />
               <span className="hidden lg:inline text-sm">
