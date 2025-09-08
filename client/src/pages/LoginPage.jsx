@@ -10,21 +10,46 @@ const LoginPage = () => {
     password: "",
   });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  // Main login handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
     try {
       const { data } = await api.post("/auth/login", formData);
       login(data.user, data.token);
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.msg || "Invalid email or password");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 1-Click Demo Login Handler
+  const handleDemoLogin = async () => {
+    setError("");
+    setIsLoading(true);
+    try {
+      // These credentials must exist in your database
+      const demoCredentials = {
+        email: "bunty@gmail.com",
+        password: "bunty",
+      };
+      const { data } = await api.post("/auth/login", demoCredentials);
+      login(data.user, data.token);
+      navigate("/");
+    } catch (err) {
+      setError("The demo account is currently unavailable.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -42,9 +67,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-white to-purple-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-white to-purple-100 p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl shadow-xl p-10">
+        <div className="bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl shadow-xl p-8 md:p-10">
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
             <img
@@ -64,36 +89,56 @@ const LoginPage = () => {
               type="email"
               name="email"
               placeholder="Email address"
+              value={formData.email}
               onChange={handleChange}
               autoComplete="email"
               required
-              className="w-full px-4 py-2 rounded-lg border bg-gray-50 focus:ring-2 focus:ring-blue-400 outline-none"
+              className="w-full px-4 py-2 rounded-lg border bg-gray-50 focus:ring-2 focus:ring-blue-400 outline-none transition-all"
             />
 
             <input
               type="password"
               name="password"
               placeholder="Password"
+              value={formData.password}
               onChange={handleChange}
               autoComplete="current-password"
               required
-              className="w-full px-4 py-2 rounded-lg border bg-gray-50 focus:ring-2 focus:ring-blue-400 outline-none"
+              className="w-full px-4 py-2 rounded-lg border bg-gray-50 focus:ring-2 focus:ring-blue-400 outline-none transition-all"
             />
 
             <button
               type="submit"
-              className="w-full py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90 transition"
+              disabled={isLoading}
+              className="w-full py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90 transition disabled:opacity-50"
             >
-              Log In
+              {isLoading ? "Loading..." : "Log In"}
             </button>
 
-            <div className="relative my-4">
-              <span className="block text-center text-sm text-gray-500">or</span>
+            {/* Demo Button - Added for Reviewers */}
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={isLoading}
+              className="w-full py-2 rounded-lg text-blue-600 font-semibold border-2 border-blue-500 hover:bg-blue-50 transition flex items-center justify-center gap-2"
+            >
+              🚀 Try with Guest Account
+            </button>
+
+            <div className="relative my-6 flex items-center">
+              <div className="flex-grow border-t border-gray-300"></div>
+              <span className="flex-shrink mx-4 text-gray-400 text-sm italic">
+                or
+              </span>
+              <div className="flex-grow border-t border-gray-300"></div>
             </div>
+
             <div className="flex justify-center">
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
-                onError={() => setError("Google sign-in was cancelled or failed.")}
+                onError={() =>
+                  setError("Google sign-in was cancelled or failed.")
+                }
                 theme="filled_black"
                 size="large"
                 text="continue_with"
@@ -103,17 +148,31 @@ const LoginPage = () => {
           </form>
 
           {error && (
-            <p className="text-red-500 text-sm mt-4 text-center">{error}</p>
+            <p className="text-red-500 text-sm mt-4 text-center font-medium">
+              {error}
+            </p>
           )}
+
+          {/* Testing Credentials Hint */}
+          <div className="mt-8 p-3 bg-blue-50/50 border border-blue-100 rounded-lg text-center">
+            <p className="text-[10px] uppercase tracking-widest text-blue-500 font-bold mb-1">
+              Testing Credentials
+            </p>
+            <p className="text-xs text-gray-600">
+              Email:{" "}
+              <span className="font-mono font-bold">bunty@gmail.com</span> |
+              Pass: <span className="font-mono font-bold">bunty</span>
+            </p>
+          </div>
         </div>
 
         {/* Footer */}
-        <div className="mt-6 text-center bg-white/80 backdrop-blur-md border rounded-xl py-4">
-          <p>
+        <div className="mt-6 text-center bg-white/80 backdrop-blur-md border border-gray-200 rounded-xl py-4 shadow-sm">
+          <p className="text-gray-600">
             Don’t have an account?{" "}
             <Link
               to="/register"
-              className="text-blue-600 font-semibold hover:underline"
+              className="text-blue-600 font-bold hover:underline"
             >
               Sign up
             </Link>
