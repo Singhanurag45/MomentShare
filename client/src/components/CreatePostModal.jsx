@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PhotoIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import api from "../services/api";
-import UserAvatar from "./UserAvatar"; // ✅ Import remains the same
+import UserAvatar from "./UserAvatar";
 
 const CreatePostModal = ({ user, onClose }) => {
   const [caption, setCaption] = useState("");

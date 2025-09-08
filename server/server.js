@@ -13,13 +13,31 @@ import aiRoutes from "./routes/aiRoutes.js";
 const app = express();
 
 const allowedOrigins = process.env.CLIENT_URLS
-  ? process.env.CLIENT_URLS.split(",")
+  ? process.env.CLIENT_URLS.split(",").map((s) => s.trim()).filter(Boolean)
   : [];
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  const o = String(origin).trim();
+  if (allowedOrigins.includes(o)) return true;
+
+  // Optional: allow Vercel preview + prod domains for this app
+  // e.g. https://moment-share-beta.vercel.app and preview URLs on *.vercel.app
+  try {
+    const { hostname } = new URL(o);
+    if (hostname === "moment-share-beta.vercel.app") return true;
+    if (hostname.endsWith(".vercel.app")) return true;
+  } catch {
+    // ignore invalid origin formats
+  }
+
+  return false;
+};
 
 const corsOptions = {
   origin: function (origin, callback) {
     // Check if the incoming origin is in our allowed list
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+    if (isAllowedOrigin(origin)) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
