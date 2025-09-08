@@ -8,6 +8,7 @@ import postRoutes from "./routes/postRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import storyRoutes from "./routes/storyRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js"; 
+import aiRoutes from "./routes/aiRoutes.js";
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/stories", storyRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/ai", aiRoutes);
 
 
 // --- START SERVER ---

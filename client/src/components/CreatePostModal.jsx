@@ -9,12 +9,17 @@ const CreatePostModal = ({ user, onClose }) => {
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiError, setAiError] = useState("");
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
+      setAiSuggestions(null);
+      setAiError("");
     }
   };
 
@@ -25,6 +30,60 @@ const CreatePostModal = ({ user, onClose }) => {
       reader.onload = () => resolve(reader.result);
       reader.onerror = (error) => reject(error);
     });
+
+  const handleGetAiSuggestions = async () => {
+    if (!file || !file.type.startsWith("image")) {
+      setError("AI suggestions are only available for images.");
+      return;
+    }
+
+    setError("");
+    setAiError("");
+    setIsAiLoading(true);
+
+    try {
+      const mediaFileBase64 = await toBase64(file);
+      const cleanBase64 = mediaFileBase64.includes(",")
+        ? mediaFileBase64.split(",")[1]
+        : mediaFileBase64;
+
+      const { data } = await api.post("/ai/generate-captions", {
+        imageBase64: cleanBase64,
+        mimeType: file.type,
+      });
+
+      setAiSuggestions(data);
+    } catch (err) {
+      console.error("Failed to get AI suggestions:", err);
+
+      if (err?.response?.status === 429) {
+        setAiError(
+          "AI suggestions are temporarily rate limited. Please try again in a moment."
+        );
+      } else {
+        setAiError(
+          "Could not fetch AI suggestions right now. Please try again."
+        );
+      }
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const handleApplyCaption = (text) => {
+    if (!text) return;
+    setCaption(text);
+  };
+
+  const handleApplyCaptionWithHashtags = (captionText) => {
+    if (!captionText || !aiSuggestions?.hashtags?.length) {
+      handleApplyCaption(captionText);
+      return;
+    }
+
+    const hashtagsLine = aiSuggestions.hashtags.join(" ");
+    handleApplyCaption(`${captionText}\n\n${hashtagsLine}`);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -134,6 +193,104 @@ const CreatePostModal = ({ user, onClose }) => {
               >
                 Select from computer
               </label>
+            )}
+
+            {preview && file?.type?.startsWith("image") && (
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={handleGetAiSuggestions}
+                  disabled={isAiLoading}
+                  className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 px-4 rounded-xl disabled:bg-purple-300 dark:disabled:bg-purple-900/40 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
+                >
+                  {isAiLoading && (
+                    <span className="h-4 w-4 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
+                  )}
+                  <span>
+                    {isAiLoading ? "Getting AI suggestions..." : "Get AI Suggestions"}
+                  </span>
+                </button>
+
+                {aiError && (
+                  <p className="text-red-500 text-xs text-center font-medium bg-red-50 dark:bg-red-900/10 py-1.5 px-2 rounded-lg">
+                    {aiError}
+                  </p>
+                )}
+
+                {aiSuggestions && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-gray-500 dark:text-text-secondary">
+                      AI caption suggestions
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {aiSuggestions.captions?.heartfelt && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleApplyCaptionWithHashtags(
+                              aiSuggestions.captions.heartfelt
+                            )
+                          }
+                          className="px-3 py-1.5 text-xs rounded-full border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/30 text-purple-800 dark:text-purple-100 hover:bg-purple-100 dark:hover:bg-purple-900/60 transition"
+                        >
+                          Heartfelt: {aiSuggestions.captions.heartfelt}
+                        </button>
+                      )}
+                      {aiSuggestions.captions?.funny && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleApplyCaptionWithHashtags(
+                              aiSuggestions.captions.funny
+                            )
+                          }
+                          className="px-3 py-1.5 text-xs rounded-full border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/30 text-purple-800 dark:text-purple-100 hover:bg-purple-100 dark:hover:bg-purple-900/60 transition"
+                        >
+                          Funny: {aiSuggestions.captions.funny}
+                        </button>
+                      )}
+                      {aiSuggestions.captions?.short && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleApplyCaptionWithHashtags(
+                              aiSuggestions.captions.short
+                            )
+                          }
+                          className="px-3 py-1.5 text-xs rounded-full border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/30 text-purple-800 dark:text-purple-100 hover:bg-purple-100 dark:hover:bg-purple-900/60 transition"
+                        >
+                          Short: {aiSuggestions.captions.short}
+                        </button>
+                      )}
+                    </div>
+
+                    {aiSuggestions.hashtags?.length > 0 && (
+                      <div className="space-y-1">
+                        <p className="text-xs font-semibold text-gray-500 dark:text-text-secondary">
+                          Hashtags
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {aiSuggestions.hashtags.slice(0, 8).map((tag, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() =>
+                                setCaption(
+                                  (prev) =>
+                                    `${prev ? `${prev.trim()}\n\n` : ""}${tag}`
+                                )
+                              }
+                              className="px-2.5 py-1 text-[11px] rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-text-primary hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                            >
+                              {tag}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             )}
 
             {error && (
