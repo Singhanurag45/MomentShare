@@ -2,7 +2,7 @@ MomentShare - A Full-Stack Social Media Platform 📸
 Welcome to MomentShare, a complete MERN stack social media application built with React, Node.js, Express, and MongoDB. This platform allows users to share multimedia content, interact with friends through a personalized feed, and engage with posts via likes and comments.
 
 ✨ Key Features
-User Authentication: Secure user registration and login using JWT (JSON Web Tokens) and bcrypt for password hashing.
+User Authentication: Secure user registration and login using JWT (JSON Web Tokens), bcrypt for password hashing, and **Google OAuth** for sign-in with Google.
 
 Create Posts & Stories: Upload photos and videos as permanent posts or as ephemeral stories that automatically disappear after 24 hours (using MongoDB's TTL feature).
 
@@ -75,11 +75,16 @@ Code snippet
 MONGO_URI=<your_mongodb_atlas_connection_string>
 JWT_SECRET=<your_strong_jwt_secret>
 PORT=5000
+GOOGLE_CLIENT_ID=<your_google_oauth_client_id>
 CLOUDINARY_CLOUD_NAME=<your_cloudinary_cloud_name>
 CLOUDINARY_API_KEY=<your_cloudinary_api_key>
 CLOUDINARY_API_SECRET=<your_cloudinary_api_secret>
 Client (/client/.env)
 Code snippet
+
+VITE_API_BASE_URL=<your_backend_api_url>
+VITE_GOOGLE_CLIENT_ID=<your_google_oauth_client_id>
+Use the same **Web application** Client ID from [Google Cloud Console](https://console.cloud.google.com/apis/credentials) for both `GOOGLE_CLIENT_ID` (server) and `VITE_GOOGLE_CLIENT_ID` (client). Create OAuth 2.0 credentials, add authorized JavaScript origins (e.g. `http://localhost:5173`, your production URL), and authorized redirect URIs if needed.
 
 👨‍💻 Developed By
 Anurag Singh

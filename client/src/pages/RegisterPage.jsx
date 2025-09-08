@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
@@ -25,6 +26,19 @@ const RegisterPage = () => {
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.msg || "Registration failed");
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError("");
+    try {
+      const { data } = await api.post("/auth/google", {
+        credential: credentialResponse.credential,
+      });
+      login(data.user, data.token);
+      navigate("/");
+    } catch (err) {
+      setError(err.response?.data?.msg || "Google sign-in failed");
     }
   };
 
@@ -85,6 +99,20 @@ const RegisterPage = () => {
             >
               Sign Up
             </button>
+
+            <div className="relative my-4">
+              <span className="block text-center text-sm text-gray-500">or</span>
+            </div>
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError("Google sign-in was cancelled or failed.")}
+                theme="filled_black"
+                size="large"
+                text="continue_with"
+                shape="rectangular"
+              />
+            </div>
           </form>
 
           {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
