@@ -40,8 +40,8 @@ const LoginPage = () => {
     try {
       // These credentials must exist in your database
       const demoCredentials = {
-        email: "bunty@gmail.com",
-        password: "bunty",
+        email: "mayank@gmail.com",
+        password: "mayank",
       };
       const { data } = await api.post("/auth/login", demoCredentials);
       login(data.user, data.token);
@@ -160,8 +160,9 @@ const LoginPage = () => {
             </p>
             <p className="text-xs text-gray-600">
               Email:{" "}
-              <span className="font-mono font-bold">bunty@gmail.com</span> |
-              Pass: <span className="font-mono font-bold">bunty</span>
+              <span className="font-mono font-bold">mayank@gmail.com</span> |
+              Pass:{" "}
+              <span className="font-mono font-bold">mayank</span>
             </p>
           </div>
         </div>
