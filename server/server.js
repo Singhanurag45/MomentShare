@@ -12,9 +12,14 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 const app = express();
 
 // --- MIDDLEWARE ---
-// ✨ These lines MUST come BEFORE your routes
+// Create a list of all allowed frontend URLs
+const allowedOrigins = [
+  "https://moment-share-beta.vercel.app", // Your main production URL
+  "https://moment-share-3u3tc8fq8-anurag-singhs-projects-5f7d2f41.vercel.app", // The specific preview URL from the error
+];
+
 const corsOptions = {
-  origin: "https://moment-share-beta.vercel.app",
+  origin: allowedOrigins,
 };
 
 // Use the specific CORS options
