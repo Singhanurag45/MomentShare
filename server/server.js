@@ -14,8 +14,7 @@ const app = express();
 // --- MIDDLEWARE ---
 // ✨ These lines MUST come BEFORE your routes
 const corsOptions = {
-  origin:
-    "https://moment-share-3u3tc8fq8-anurag-singhs-projects-5f7d2f41.vercel.app",
+  origin: "https://moment-share-beta.vercel.app",
 };
 
 // Use the specific CORS options
