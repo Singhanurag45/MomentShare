@@ -12,14 +12,20 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 const app = express();
 
 // --- MIDDLEWARE ---
-// Create a list of all allowed frontend URLs
 const allowedOrigins = [
   "https://moment-share-beta.vercel.app", // Your main production URL
-  "https://moment-share-3u3tc8fq8-anurag-singhs-projects-5f7d2f41.vercel.app", // The specific preview URL from the error
+  "https://moment-share-3u3tc8fq8-anurag-singhs-projects-5f7d2f41.vercel.app", // The specific preview URL
 ];
 
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    // Check if the incoming origin is in our allowed list
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
 };
 
 // Use the specific CORS options
