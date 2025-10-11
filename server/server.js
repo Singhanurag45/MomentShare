@@ -13,7 +13,15 @@ const app = express();
 
 // --- MIDDLEWARE ---
 // ✨ These lines MUST come BEFORE your routes
-app.use(cors());
+const corsOptions = {
+  origin:
+    "https://moment-share-3u3tc8fq8-anurag-singhs-projects-5f7d2f41.vercel.app",
+};
+
+// Use the specific CORS options
+app.use(cors(corsOptions));
+
+
 app.use(express.json({ limit: "50mb" })); // This line parses incoming JSON requests
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
