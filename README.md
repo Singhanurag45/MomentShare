@@ -34,19 +34,14 @@ Authentication: JSON Web Token (JWT)
 Media Storage: Cloudinary API
 
 Deployment:
-
 Frontend deployed on Vercel.
-
 Backend deployed on Render.
 
 🚀 Getting Started
 To run this project locally, follow these steps:
 
 1. Clone the repository
-Bash
 
-git clone https://github.com/Singhanurag45/MomentShare.git
-cd MomentShare
 2. Backend Setup
 Bash
 
@@ -88,10 +83,8 @@ CLOUDINARY_API_SECRET=<your_cloudinary_api_secret>
 Client (/client/.env)
 Code snippet
 
-VITE_API_BASE_URL=http://localhost:5000/api
 👨‍💻 Developed By
 Anurag Singh
 
-LinkedIn: @anurag-singh
 
 GitHub: @Singhanurag45
