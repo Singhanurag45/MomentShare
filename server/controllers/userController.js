@@ -152,3 +152,37 @@ export const searchUsers = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+// ... (keep all existing imports and functions)
+
+// ✨ NEW: Function to get a user's followers
+export const getUserFollowers = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).populate(
+      "followers",
+      "username profilePicture fullName" // Select the fields you want to show
+    );
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+    res.json(user.followers);
+  } catch (err) {
+    res.status(500).send("Server Error");
+  }
+};
+
+// ✨ NEW: Function to get the list of users someone is following
+export const getUserFollowing = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).populate(
+      "following",
+      "username profilePicture fullName" // Select the fields you want to show
+    );
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+    res.json(user.following);
+  } catch (err) {
+    res.status(500).send("Server Error");
+  }
+};

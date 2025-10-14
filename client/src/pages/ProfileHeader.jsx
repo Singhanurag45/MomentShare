@@ -6,6 +6,8 @@ const ProfileHeader = ({
   isOwnProfile,
   onFollow,
   onEditProfile,
+  onShowFollowers,
+  onShowFollowing
 }) => {
   // Determine the text for the follow/unfollow button
   const followButtonText = profile.isFollowedByCurrentUser
@@ -59,16 +61,17 @@ const ProfileHeader = ({
           <div>
             <span className="font-semibold">{postCount}</span> posts
           </div>
-          <div>
+          {/* ✨ Make these clickable */}
+          <button onClick={onShowFollowers} className="hover:text-primary">
             <span className="font-semibold">{profile.followers.length}</span>{" "}
             followers
-          </div>
-          <div>
+          </button>
+          <button onClick={onShowFollowing} className="hover:text-primary">
             <span className="font-semibold">{profile.following.length}</span>{" "}
             following
-          </div>
+          </button>
         </div>
-
+        
         {/* Full Name and Bio */}
         <div>
           <p className="font-semibold text-gray-900">

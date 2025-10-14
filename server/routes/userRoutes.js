@@ -8,6 +8,8 @@ import {
   updateProfilePicture,
   updateProfileDetails,
   searchUsers,
+  getUserFollowers,
+  getUserFollowing
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -16,6 +18,9 @@ const router = express.Router();
 router.get("/search", authMiddleware, searchUsers);
 router.put("/details", authMiddleware, updateProfileDetails);
 router.put("/picture", authMiddleware, updateProfilePicture);
+
+router.get("/:userId/followers", authMiddleware, getUserFollowers);
+router.get("/:userId/following", authMiddleware, getUserFollowing);
 
 // --- dynamic routes ---
 router.get("/suggestions", authMiddleware, getSuggestions);
