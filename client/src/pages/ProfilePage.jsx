@@ -120,7 +120,7 @@ const ProfilePage = () => {
       <div className="container mx-auto p-4 max-w-4xl">
         <ProfileHeader
           profile={profile}
-          postCount={posts.length}
+          postCount={posts?.length || 0}
           isOwnProfile={isOwnProfile}
           onFollow={handleFollow}
           onEditProfile={() => setIsEditModalOpen(true)}
