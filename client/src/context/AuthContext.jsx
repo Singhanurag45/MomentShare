@@ -13,20 +13,30 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const loadUser = async () => {
       const storedToken = localStorage.getItem("token");
-      if (storedToken) {
-        setToken(storedToken);
-        api.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
-        try {
-          // Fetch user data using the new '/auth/me' endpoint
-          const { data } = await api.get("/auth/me");
-          setUser(data);
-        } catch (error) {
-          // If token is invalid, log out the user
-          console.error("Failed to load user", error);
-          logout();
-        }
+      
+      // If there's no token, don't even try to fetch /me
+      if (!storedToken) {
+        setLoading(false);
+        return;
       }
-      setLoading(false);
+
+      try {
+        setToken(storedToken);
+        // Explicitly set the header for this specific call to be safe
+        const { data } = await api.get("/auth/me", {
+          headers: { Authorization: `Bearer ${storedToken}` }
+        });
+        setUser(data);
+      } catch (error) {
+        console.error("Failed to load user", error);
+        // If the server says 401 (Unauthorized), clear everything
+        if (error.response?.status === 401) {
+          logout();
+          window.location.href = "/login";
+        }
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadUser();
@@ -34,9 +44,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData, userToken) => {
     localStorage.setItem("token", userToken);
+    // Set the header specifically for the instance
+    api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
     setToken(userToken);
     setUser(userData);
-    api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
   };
 
   const logout = () => {
