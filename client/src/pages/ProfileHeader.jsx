@@ -1,4 +1,5 @@
 import React from "react";
+import defaultAvatar from "../assets/avatar.png";
 
 const ProfileHeader = ({
   profile,
@@ -15,10 +16,13 @@ const ProfileHeader = ({
       <img
         src={
           profile.profilePicture ||
-          `https://i.pravatar.cc/150?u=${profile.username}`
+          defaultAvatar
         }
         alt={profile.username}
         className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover border-2 border-gray-200 shadow-sm"
+        onError={(e) => {
+          e.target.src = defaultAvatar;
+        }}
       />
 
       {/* Profile Info */}
@@ -56,23 +60,13 @@ const ProfileHeader = ({
             <span className="font-semibold">{postCount}</span> posts
           </div>
 
-          <button
-            onClick={onShowFollowers}
-            className="hover:text-blue-500"
-          >
-            <span className="font-semibold">
-              {profile.followers.length}
-            </span>{" "}
+          <button onClick={onShowFollowers} className="hover:text-blue-500">
+            <span className="font-semibold">{profile.followers.length}</span>{" "}
             followers
           </button>
 
-          <button
-            onClick={onShowFollowing}
-            className="hover:text-blue-500"
-          >
-            <span className="font-semibold">
-              {profile.following.length}
-            </span>{" "}
+          <button onClick={onShowFollowing} className="hover:text-blue-500">
+            <span className="font-semibold">{profile.following.length}</span>{" "}
             following
           </button>
         </div>
@@ -83,9 +77,7 @@ const ProfileHeader = ({
             {profile.fullName || profile.username}
           </p>
           {profile.bio && (
-            <p className="text-gray-600 leading-snug max-w-md">
-              {profile.bio}
-            </p>
+            <p className="text-gray-600 leading-snug max-w-md">{profile.bio}</p>
           )}
         </div>
       </div>

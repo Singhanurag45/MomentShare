@@ -99,7 +99,6 @@ const EditProfileModal = ({ user, onClose, onProfileUpdate }) => {
               </div>
             </div>
 
-            {/* --- Full Name Input --- */}
             <div>
               <label
                 htmlFor="fullName"

@@ -7,16 +7,16 @@ const UserSchema = new mongoose.Schema(
     password: { type: String, required: true },
     profilePicture: {
       type: String,
-      default: "https://via.placeholder.com/150",
+      default: null,
     },
 
-    bio: { type: String, default: "", maxLength: 150 }, 
-    country: { type: String }, 
-    fullName: { type: String }, 
+    bio: { type: String, default: "", maxLength: 150 },
+    country: { type: String },
+    fullName: { type: String },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const User = mongoose.model("User", UserSchema);

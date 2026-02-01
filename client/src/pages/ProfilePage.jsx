@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import api from "../services/api";
-import PostGrid from "../pages/PostGrid";
+import PostGrid from "./PostGrid";
 import FeedSkeleton from "../components/FeedSkeleton";
 import { useAuth } from "../context/AuthContext";
+import EditProfileModal from "../components/EditProfileModal";
+import UserAvatar from "../components/UserAvatar";
+
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -13,24 +16,26 @@ const ProfilePage = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showEditProfile, setShowEditProfile] = useState(false);
 
   const isOwnProfile = loggedInUser?.username === username;
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        const { data } = await api.get(`/users/${username}`);
-        setProfile(data.user);
-        setPosts(data.posts || []);
-      } catch (err) {
-        console.error("Profile fetch failed:", err);
-        setError("User not found");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      const { data } = await api.get(`/users/${username}`);
+      setProfile(data.user);
+      setPosts(data.posts || []);
+      setError(null);
+    } catch (err) {
+      console.error("Profile fetch failed:", err);
+      setError("User not found");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProfile();
   }, [username]);
 
@@ -44,9 +49,7 @@ const ProfilePage = () => {
 
   if (error) {
     return (
-      <p className="text-center text-red-500 font-medium mt-32">
-        {error}
-      </p>
+      <p className="text-center text-red-500 font-medium mt-32">{error}</p>
     );
   }
 
@@ -54,40 +57,37 @@ const ProfilePage = () => {
 
   return (
     <div className="max-w-4xl mx-auto pt-24 px-4">
-
       {/* Profile Header */}
       <div className="flex flex-col sm:flex-row gap-8 items-center sm:items-start mb-10">
+        
+        <div className="flex-shrink-0">
+           <UserAvatar 
+             user={profile} 
+             size="w-32 h-32" 
+             textSize="text-6xl"
+             className="border-4 border-white shadow-md"
+           />
+        </div>
 
-        {/* Avatar */}
-        <img
-          src={profile.avatar || "/default-avatar.png"}
-          alt={profile.username}
-          className="w-32 h-32 rounded-full object-cover border"
-        />
-
-        {/* User Info */}
+        {/* Info */}
         <div className="flex-1 text-center sm:text-left">
-
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <h2 className="text-2xl font-semibold">
-              {profile.username}
-            </h2>
+            <h2 className="text-2xl font-semibold">{profile.username}</h2>
 
             {isOwnProfile && (
-              <Link
-                to="/edit-profile"
+              <button
+                onClick={() => setShowEditProfile(true)}
                 className="px-4 py-1.5 border rounded-md text-sm font-medium hover:bg-gray-100 transition"
               >
                 Edit Profile
-              </Link>
+              </button>
             )}
           </div>
 
           {/* Stats */}
           <div className="flex justify-center sm:justify-start gap-6 mt-4">
             <div>
-              <span className="font-semibold">{posts.length}</span>{" "}
-              posts
+              <span className="font-semibold">{posts.length}</span> posts
             </div>
             <div>
               <span className="font-semibold">
@@ -112,11 +112,18 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      {/* Divider */}
       <div className="border-t mb-6" />
 
-      {/* Posts Grid */}
       <PostGrid posts={posts} />
+
+      {/* Edit Profile Modal */}
+      {showEditProfile && (
+        <EditProfileModal
+          user={profile}
+          onClose={() => setShowEditProfile(false)}
+          onProfileUpdate={fetchProfile}
+        />
+      )}
     </div>
   );
 };

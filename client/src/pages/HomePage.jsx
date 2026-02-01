@@ -13,6 +13,7 @@ import CreateStoryModal from "../components/CreateStoryModal";
 import StoryViewer from "../components/StoryViewer";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
+import defaultAvatar from "../assets/avatar.png";
 
 const HomePage = () => {
   const { user } = useAuth();
