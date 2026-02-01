@@ -5,7 +5,6 @@ import {
   VideoCameraIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
-import defaultAvatar from "../assets/avatar.png";
 import UserAvatar from "./UserAvatar";
 
 const CreatePostPrompt = ({ user }) => {
