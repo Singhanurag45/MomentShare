@@ -13,9 +13,8 @@ const RegisterPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,71 +24,80 @@ const RegisterPage = () => {
       login(data.user, data.token);
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.msg || "Registration failed.");
+      setError(err.response?.data?.msg || "Registration failed");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-sm">
-        <div className="p-10 bg-white border rounded-lg shadow-sm text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-white to-blue-100">
+      <div className="w-full max-w-md">
+        <div className="bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl shadow-xl p-10 text-center">
+          {/* Logo */}
           <div className="flex flex-col items-center mb-6">
             <img
               src="/logo.png"
-              alt="MomentShare Logo"
-              className="w-20 h-20 rounded-full object-cover border-2 border-blue-500 shadow-sm"
+              alt="MomentShare"
+              className="w-20 h-20 rounded-full border-2 border-blue-500 shadow"
             />
-            <h1 className="text-4xl font-semibold font-serif text-center mt-4 text-blue-600">
+            <h1 className="text-4xl font-bold mt-4 text-blue-600">
               Moment<span className="text-gray-800">Share</span>
             </h1>
+            <p className="text-gray-500 text-sm mt-2">
+              Sign up to see photos & videos from friends
+            </p>
           </div>
 
-          <p className="text-gray-500 font-semibold mb-6">
-            Sign up to see photos and videos from your friends.
-          </p>
-
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="email"
               name="email"
-              placeholder="Email"
+              placeholder="Email address"
               onChange={handleChange}
+              autoComplete="email"
               required
-              className="w-full px-3 py-2 bg-gray-50 border rounded-md"
+              className="w-full px-4 py-2 rounded-lg border bg-gray-50 focus:ring-2 focus:ring-blue-400 outline-none"
             />
+
             <input
               type="text"
               name="username"
               placeholder="Username"
               onChange={handleChange}
+              autoComplete="username"
               required
-              className="w-full px-3 py-2 bg-gray-50 border rounded-md"
+              className="w-full px-4 py-2 rounded-lg border bg-gray-50 focus:ring-2 focus:ring-blue-400 outline-none"
             />
+
             <input
               type="password"
               name="password"
               placeholder="Password"
               onChange={handleChange}
+              autoComplete="new-password"
               required
-              className="w-full px-3 py-2 bg-gray-50 border rounded-md"
+              className="w-full px-4 py-2 rounded-lg border bg-gray-50 focus:ring-2 focus:ring-blue-400 outline-none"
             />
+
             <button
               type="submit"
-              className="w-full py-2 text-white font-semibold bg-blue-500 rounded-md hover:bg-blue-600"
+              className="w-full py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90 transition"
             >
               Sign Up
             </button>
           </form>
 
-          {error && (
-            <p className="text-red-500 text-sm mt-4 text-center">{error}</p>
-          )}
+          {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
         </div>
 
-        <div className="p-6 mt-4 text-center bg-white border rounded-lg shadow-sm">
+        {/* Footer */}
+        <div className="mt-6 text-center bg-white/80 backdrop-blur-md border rounded-xl py-4">
           <p>
-            Have an account?{" "}
-            <Link to="/login" className="text-blue-500 font-semibold">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-blue-600 font-semibold hover:underline"
+            >
               Log in
             </Link>
           </p>

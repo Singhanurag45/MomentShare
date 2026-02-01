@@ -1,136 +1,123 @@
-import { useEffect, useState, useCallback } from "react"; // ✨ Import useCallback
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
+import PostGrid from "../pages/PostGrid";
+import FeedSkeleton from "../components/FeedSkeleton";
 import { useAuth } from "../context/AuthContext";
 
-import ProfileHeader from "./ProfileHeader";
-import PostGrid from "./PostGrid";
-import ProfileSkeleton from "./ProfileSkeleton";
-import EditProfileModal from "../components/EditProfileModal";
-
-import FollowListModal from "../components/FollowListModal";
-
 const ProfilePage = () => {
+  const { username } = useParams();
+  const { user: loggedInUser } = useAuth();
+
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // ✨ 2. Add state for the follow list modal
-  const [isFollowModalOpen, setIsFollowModalOpen] = useState(false);
-  const [followListData, setFollowListData] = useState({
-    title: "",
-    users: [],
-  });
+  const isOwnProfile = loggedInUser?.username === username;
 
-  const { username } = useParams();
-  const { user: currentUser } = useAuth();
-
-  // ✨ Wrap the data fetching logic in a useCallback hook
-  const fetchProfile = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { data } = await api.get(`/users/${username}`);
-      const isFollowed = data.user.followers.includes(currentUser._id);
-      setProfile({ ...data.user, isFollowedByCurrentUser: isFollowed });
-      setPosts(data.posts);
-      setError(null);
-    } catch (err) {
-      console.error("Failed to fetch profile:", err);
-      setError("Could not load the profile. The user may not exist.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [username, currentUser._id]); // Dependencies for the function
-
-  // useEffect now just calls the fetchProfile function
   useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const { data } = await api.get(`/users/${username}`);
+        setProfile(data.user);
+        setPosts(data.posts || []);
+      } catch (err) {
+        console.error("Profile fetch failed:", err);
+        setError("User not found");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchProfile();
-  }, [fetchProfile]);
+  }, [username]);
 
-  // ✨ This function now simply triggers a refetch
-  const handleProfileUpdate = () => {
-    fetchProfile(); // Re-fetch the data to get the latest updates
-  };
-
-  // ... (handleFollow logic remains the same) ...
-  const handleFollow = async () => {
-    const originalProfile = profile;
-    const isFollowing = profile.isFollowedByCurrentUser;
-    setProfile((prevProfile) => ({
-      ...prevProfile,
-      isFollowedByCurrentUser: !isFollowing,
-      followers: isFollowing
-        ? prevProfile.followers.filter((id) => id !== currentUser._id)
-        : [...prevProfile.followers, currentUser._id],
-    }));
-    try {
-      await api.put(
-        `/users/${profile._id}/${isFollowing ? "unfollow" : "follow"}`
-      );
-    } catch (err) {
-      setProfile(originalProfile);
-    }
-  };
-
-  // ✨ 3. Add function to fetch list and open modal
-  const handleShowFollowList = async (listType) => {
-    // listType will be 'followers' or 'following'
-    try {
-      setFollowListData({ title: "Loading...", users: [] }); // Set loading state
-      setIsFollowModalOpen(true);
-      const { data } = await api.get(`/users/${profile._id}/${listType}`);
-      const title = listType.charAt(0).toUpperCase() + listType.slice(1);
-      setFollowListData({ title, users: data });
-    } catch (error) {
-      console.error(`Failed to fetch ${listType}`, error);
-      setIsFollowModalOpen(false); // Close modal on error
-    }
-  };
-
-  if (isLoading) return <ProfileSkeleton />;
-  if (error)
+  if (loading) {
     return (
-      <div className="text-center text-red-500 mt-10 font-medium">{error}</div>
+      <div className="max-w-4xl mx-auto pt-24 px-4">
+        <FeedSkeleton />
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <p className="text-center text-red-500 font-medium mt-32">
+        {error}
+      </p>
+    );
+  }
+
   if (!profile) return null;
 
-  const isOwnProfile = currentUser?.username === profile.username;
-
   return (
-    <>
-      {isEditModalOpen && (
-        <EditProfileModal
-          user={profile}
-          onClose={() => setIsEditModalOpen(false)}
-          onProfileUpdate={handleProfileUpdate} // This now triggers the refetch
-        />
-      )}
+    <div className="max-w-4xl mx-auto pt-24 px-4">
 
-      {/* ✨ 4. Conditionally render the new modal */}
-      {isFollowModalOpen && (
-        <FollowListModal
-          title={followListData.title}
-          users={followListData.users}
-          onClose={() => setIsFollowModalOpen(false)}
-        />
-      )}
+      {/* Profile Header */}
+      <div className="flex flex-col sm:flex-row gap-8 items-center sm:items-start mb-10">
 
-      <div className="container mx-auto p-4 max-w-4xl">
-        <ProfileHeader
-          profile={profile}
-          postCount={posts?.length || 0}
-          isOwnProfile={isOwnProfile}
-          onFollow={handleFollow}
-          onEditProfile={() => setIsEditModalOpen(true)}
-          onShowFollowers={() => handleShowFollowList("followers")}
-          onShowFollowing={() => handleShowFollowList("following")}
+        {/* Avatar */}
+        <img
+          src={profile.avatar || "/default-avatar.png"}
+          alt={profile.username}
+          className="w-32 h-32 rounded-full object-cover border"
         />
-        <hr className="my-8 border-gray-200" />
-        <PostGrid posts={posts} />
+
+        {/* User Info */}
+        <div className="flex-1 text-center sm:text-left">
+
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <h2 className="text-2xl font-semibold">
+              {profile.username}
+            </h2>
+
+            {isOwnProfile && (
+              <Link
+                to="/edit-profile"
+                className="px-4 py-1.5 border rounded-md text-sm font-medium hover:bg-gray-100 transition"
+              >
+                Edit Profile
+              </Link>
+            )}
+          </div>
+
+          {/* Stats */}
+          <div className="flex justify-center sm:justify-start gap-6 mt-4">
+            <div>
+              <span className="font-semibold">{posts.length}</span>{" "}
+              posts
+            </div>
+            <div>
+              <span className="font-semibold">
+                {profile.followers?.length || 0}
+              </span>{" "}
+              followers
+            </div>
+            <div>
+              <span className="font-semibold">
+                {profile.following?.length || 0}
+              </span>{" "}
+              following
+            </div>
+          </div>
+
+          {/* Bio */}
+          {profile.bio && (
+            <p className="mt-4 text-sm text-gray-700 whitespace-pre-line">
+              {profile.bio}
+            </p>
+          )}
+        </div>
       </div>
-    </>
+
+      {/* Divider */}
+      <div className="border-t mb-6" />
+
+      {/* Posts Grid */}
+      <PostGrid posts={posts} />
+    </div>
   );
 };
 

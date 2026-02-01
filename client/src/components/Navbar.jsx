@@ -2,14 +2,12 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   HomeIcon,
   UserCircleIcon,
-  ArrowLeftOnRectangleIcon,
   PlusCircleIcon,
-  BellIcon,
 } from "@heroicons/react/24/outline";
 
 import { useAuth } from "../context/AuthContext";
-import SearchBar from "./SearchBar"; // ✨ Import
-import Notifications from "./Notifications"; 
+import SearchBar from "./SearchBar";
+import Notifications from "./Notifications";
 
 const Navbar = ({ onOpenCreatePostModal }) => {
   const { user, logout } = useAuth();
@@ -24,6 +22,8 @@ const Navbar = ({ onOpenCreatePostModal }) => {
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+
+          {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <img
               src="/logo.png"
@@ -36,13 +36,14 @@ const Navbar = ({ onOpenCreatePostModal }) => {
             </h1>
           </Link>
 
-          {/* Search Bar (center) */}
+          {/* Search Bar */}
           <div className="hidden md:block">
             <SearchBar />
           </div>
 
-          {/* Navigation Links */}
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
+
             <Link
               to="/"
               className="flex items-center gap-1 text-gray-700 hover:text-blue-600 transition"
@@ -51,7 +52,7 @@ const Navbar = ({ onOpenCreatePostModal }) => {
               <span className="hidden sm:inline text-sm font-medium">Home</span>
             </Link>
 
-            {/* ✅ Create Post Button triggers modal */}
+            {/* Create Post */}
             <button
               onClick={onOpenCreatePostModal}
               className="flex items-center gap-1 text-gray-700 hover:text-blue-600 transition"
@@ -62,10 +63,13 @@ const Navbar = ({ onOpenCreatePostModal }) => {
               </span>
             </button>
 
-            <button className="flex items-center space-x-1 hover:text-primary">
+            {/* 🔥 FIXED Notifications Wrapper */}
+            <div className="flex items-center space-x-1 hover:text-blue-600 cursor-pointer">
               <Notifications />
-              <span className="hidden lg:inline text-sm">Notification</span>
-            </button>
+              <span className="hidden lg:inline text-sm">
+                Notification
+              </span>
+            </div>
 
             <Link
               to={`/${user?.username}`}
@@ -77,7 +81,7 @@ const Navbar = ({ onOpenCreatePostModal }) => {
               </span>
             </Link>
 
-            {/* Logout Button */}
+            {/* Logout */}
             <button
               onClick={handleLogout}
               className="px-3 py-1.5 bg-blue-500 text-white rounded-lg text-sm font-semibold hover:bg-blue-600 transition"
@@ -86,16 +90,17 @@ const Navbar = ({ onOpenCreatePostModal }) => {
             </button>
           </div>
 
-          {/* Mobile Menu (icons only) */}
+          {/* Mobile Icons */}
           <div className="md:hidden flex items-center space-x-3">
-            {/* ✅ Mobile Create button also opens modal */}
             <button onClick={onOpenCreatePostModal}>
               <PlusCircleIcon className="h-7 w-7 text-gray-700 hover:text-blue-600" />
             </button>
+
             <button onClick={handleLogout}>
               <UserCircleIcon className="h-7 w-7 text-gray-700 hover:text-blue-600" />
             </button>
           </div>
+
         </div>
       </div>
     </nav>
