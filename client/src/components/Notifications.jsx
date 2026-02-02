@@ -22,21 +22,18 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const notificationRef = useRef(null);
-
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   useEffect(() => {
     api.get("/notifications").then((res) => setNotifications(res.data));
   }, []);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
         notificationRef.current &&
         !notificationRef.current.contains(event.target)
-      ) {
+      )
         setIsOpen(false);
-      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -63,7 +60,6 @@ const Notifications = () => {
           </span>
         )}
       </button>
-
       {isOpen && (
         <div className="absolute top-12 right-0 w-80 bg-white dark:bg-surface border border-gray-100 dark:border-border rounded-xl shadow-xl max-h-96 overflow-y-auto z-50">
           <div className="p-3 font-semibold border-b border-gray-100 dark:border-border text-gray-800 dark:text-text-primary">
@@ -74,20 +70,17 @@ const Notifications = () => {
               {notifications.map((notif) => (
                 <li
                   key={notif._id}
-                  className={`border-b border-gray-50 dark:border-border last:border-none ${
-                    !notif.read ? "bg-blue-50/50 dark:bg-primary/10" : ""
-                  }`}
+                  className={`border-b border-gray-50 dark:border-border last:border-none ${!notif.read ? "bg-blue-50/50 dark:bg-primary/10" : ""}`}
                 >
                   <Link
                     to={
                       notif.type === "follow"
                         ? `/${notif.sender.username}`
-                        : `/post/${notif.post}` // Ensure you have a generic Post route or handle this link correctly
+                        : `/post/${notif.post}`
                     }
                     onClick={() => setIsOpen(false)}
                     className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                   >
-                    {/* 👇 REPLACED IMG WITH USERAVATAR */}
                     <div className="flex-shrink-0">
                       <UserAvatar
                         user={notif.sender}
@@ -95,7 +88,6 @@ const Notifications = () => {
                         textSize="text-sm"
                       />
                     </div>
-
                     <div className="flex-grow">
                       <NotificationText notification={notif} />
                     </div>
@@ -113,5 +105,4 @@ const Notifications = () => {
     </div>
   );
 };
-
 export default Notifications;

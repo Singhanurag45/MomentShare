@@ -1,3 +1,4 @@
+
 const PostSkeleton = () => (
   <div className="bg-white border rounded-lg shadow-sm p-4">
     <div className="flex items-center mb-4">

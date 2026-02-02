@@ -29,21 +29,27 @@ export const createStory = async (req, res) => {
   }
 };
 
-// --- Get stories for the user's feed ---
+// --- Get stories (Self + Following, Last 24h) ---
 export const getStories = async (req, res) => {
   try {
     const currentUser = await User.findById(req.user.id);
-    const followingIds = currentUser.following;
 
-    // We also want to see our own stories
+    // 1. Get IDs of people I follow AND my own ID
+    const followingIds = currentUser.following;
     const userIds = [req.user.id, ...followingIds];
 
-    // Find all stories from the user and people they follow
-    const stories = await Story.find({ user: { $in: userIds } })
-      .populate("user", "username profilePicture")
-      .sort({ createdAt: -1 });
+    // 2. Calculate 24 hours ago
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-    // Group stories by user
+    // 3. Find stories created in the last 24h by these users
+    const stories = await Story.find({
+      user: { $in: userIds },
+      createdAt: { $gt: twentyFourHoursAgo }, // Only newer than 24h
+    })
+      .populate("user", "username profilePicture")
+      .sort({ createdAt: 1 }); // Oldest first so they play in order
+
+    // 4. Group stories by user
     const groupedStories = stories.reduce((acc, story) => {
       const userId = story.user._id.toString();
       if (!acc[userId]) {
@@ -58,6 +64,7 @@ export const getStories = async (req, res) => {
       return acc;
     }, {});
 
+    // Return as an array
     res.json(Object.values(groupedStories));
   } catch (err) {
     console.error(err);
