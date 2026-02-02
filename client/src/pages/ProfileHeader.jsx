@@ -12,7 +12,6 @@ const ProfileHeader = ({
 }) => {
   return (
     <header className="flex flex-col sm:flex-row items-center sm:items-start gap-6 p-4">
-      {/* Profile Picture */}
       <img
         src={
           profile.profilePicture ||

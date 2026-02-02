@@ -2,28 +2,23 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 
-import Stories from "../components/Stories";
 import PostCard from "../components/PostCard";
-import CreatePostPrompt from "../components/CreatePostPrompt";
-import FeedSkeleton from "../components/FeedSkeleton";
+import CreatePostPrompt from "../components/CreatePostPrompt"; 
 import EmptyFeed from "../components/EmptyFeed";
 
 import CreatePostModal from "../components/CreatePostModal";
 import CreateStoryModal from "../components/CreateStoryModal";
-import StoryViewer from "../components/StoryViewer";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 
 const HomePage = () => {
   const { user } = useAuth();
-
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
-  const [viewingStories, setViewingStories] = useState(null);
+  const [isStoryModalOpen, setIsStoryModalOpen] = useState(false); // ✅ Keep this state
   const [storyRefetchTrigger, setStoryRefetchTrigger] = useState(0);
 
   const fetchFeed = async () => {
@@ -47,14 +42,10 @@ const HomePage = () => {
     if (loading) return <FeedSkeleton />;
     if (error)
       return (
-        <p className="text-center text-red-500 font-medium mt-10">
-          {error}
-        </p>
+        <p className="text-center text-red-500 font-medium mt-10">{error}</p>
       );
     if (posts.length === 0) return <EmptyFeed />;
-    return posts.map((post) => (
-      <PostCard key={post._id} post={post} />
-    ));
+    return posts.map((post) => <PostCard key={post._id} post={post} />);
   };
 
   return (
@@ -71,19 +62,11 @@ const HomePage = () => {
         />
       )}
 
+      {/* Story Modal (Keep this so the button works!) */}
       {isStoryModalOpen && (
         <CreateStoryModal
           onClose={() => setIsStoryModalOpen(false)}
-          onStoryPosted={() =>
-            setStoryRefetchTrigger((prev) => prev + 1)
-          }
-        />
-      )}
-
-      {viewingStories && (
-        <StoryViewer
-          userStoryGroup={viewingStories}
-          onClose={() => setViewingStories(null)}
+          onStoryPosted={() => setStoryRefetchTrigger((prev) => prev + 1)}
         />
       )}
 
@@ -91,22 +74,20 @@ const HomePage = () => {
       <div className="min-h-screen bg-gray-100 dark:bg-background">
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
             {/* Feed Section */}
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white dark:bg-card rounded-xl shadow-sm p-4">
-                <Stories
-                  key={storyRefetchTrigger}
-                  onAddStoryClick={() => setIsStoryModalOpen(true)}
-                  onViewStoryClick={setViewingStories}
-                />
-              </div>
+              {/* ❌ REMOVED <Stories /> COMPONENT FROM HERE */}
 
               <div
-                onClick={() => setIsPostModalOpen(true)}
-                className="cursor-pointer bg-white dark:bg-card rounded-xl shadow-sm"
+                // Remove the onClick here so clicking the background doesn't open the post modal
+                className="bg-white dark:bg-card rounded-xl shadow-sm"
               >
-                <CreatePostPrompt user={user} />
+                {/* 👇 PASS BOTH HANDLERS HERE */}
+                <CreatePostPrompt
+                  user={user}
+                  onStoryClick={() => setIsStoryModalOpen(true)} // Opens Story Modal
+                  onPostClick={() => setIsPostModalOpen(true)} // Opens Post Modal
+                />
               </div>
 
               <div className="space-y-6">{renderContent()}</div>
@@ -116,10 +97,8 @@ const HomePage = () => {
             <div className="hidden lg:block sticky top-24 h-fit">
               <Sidebar user={user} />
             </div>
-
           </div>
         </div>
-
         <Footer />
       </div>
     </>

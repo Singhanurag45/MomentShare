@@ -15,10 +15,8 @@ const UserAvatar = ({
     !user.profilePicture.includes("via.placeholder.com") && 
     !imgError;
 
-  // Get the first letter of the username
   const initial = user?.username ? user.username.charAt(0).toUpperCase() : "?";
 
-  // Shared Gradient Style
   const gradientClass = "bg-gradient-to-br from-violet-500 to-fuchsia-500";
 
   if (hasValidImage) {

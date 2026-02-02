@@ -6,41 +6,8 @@ import {
 } from "@heroicons/react/24/solid";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
+// 👇 Import the shared component (Make sure this path is correct)
 import UserAvatar from "./UserAvatar";
-
-const StoryAvatar = ({ user, size = "w-16 h-16" }) => {
-  const [imgError, setImgError] = useState(false);
-
-  const hasValidImage =
-    user?.profilePicture && // Checks for null/undefined/empty string
-    !imgError;
-
-  // Get the first letter of the username safely
-  const initial = user?.username ? user.username.charAt(0).toUpperCase() : "?";
-
-  // Modern gradient for the fallback avatar
-  const gradientClass = "bg-gradient-to-br from-violet-500 to-fuchsia-500";
-
-  if (hasValidImage) {
-    return (
-      <img
-        className={`${size} rounded-full object-cover border-2 border-white dark:border-surface`}
-        src={user.profilePicture}
-        alt={user.username}
-        onError={() => setImgError(true)} // If image link breaks, fallback to initials
-      />
-    );
-  }
-
-  // Fallback: Render the Colored Initial
-  return (
-    <div
-      className={`${size} ${gradientClass} rounded-full flex items-center justify-center text-white font-bold text-xl shadow-inner border-2 border-white dark:border-surface`}
-    >
-      {initial}
-    </div>
-  );
-};
 
 const Stories = ({ onAddStoryClick, onViewStoryClick }) => {
   const { user: currentUser } = useAuth();
@@ -60,44 +27,55 @@ const Stories = ({ onAddStoryClick, onViewStoryClick }) => {
   }, []);
 
   const scroll = (direction) => {
-    scrollRef.current.scrollBy({
-      left: direction === "left" ? -300 : 300,
-      behavior: "smooth",
-    });
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({
+        left: direction === "left" ? -300 : 300,
+        behavior: "smooth",
+      });
+    }
   };
 
   return (
-    <div className="bg-white dark:bg-surface border border-gray-100 dark:border-border rounded-xl shadow-sm p-4 relative group">
+    <div className="bg-white dark:bg-surface border border-gray-100 dark:border-border rounded-2xl shadow-sm p-5 relative group mb-6">
+      {/* Title (Optional - removes if you want pure Instagram style) */}
+      <h3 className="text-gray-500 dark:text-text-secondary font-semibold text-sm mb-4 px-1">
+        Stories
+      </h3>
+
       <div className="relative flex items-center">
-        {/* Left Scroll Button */}
+        {/* Left Scroll Button (Glass Effect) */}
         <button
           onClick={() => scroll("left")}
-          className="absolute -left-4 z-10 bg-white/80 dark:bg-surface/80 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute -left-3 z-10 bg-white/90 dark:bg-surface/90 backdrop-blur-sm p-1.5 rounded-full shadow-md border border-gray-100 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 text-gray-700 dark:text-gray-300"
         >
           <ChevronLeftIcon className="h-5 w-5" />
         </button>
 
         <div
           ref={scrollRef}
-          className="flex space-x-4 overflow-x-auto scrollbar-hide scroll-smooth"
+          className="flex space-x-5 overflow-x-auto scrollbar-hide scroll-smooth py-1 px-1"
         >
           {/* Create Story (Current User) */}
           <div
             onClick={onAddStoryClick}
-            className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer group"
+            className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer group/story"
           >
-            <div className="relative bg-gradient-to-tr from-primary to-secondary p-0.5 rounded-full group-hover:scale-105 transition-transform">
-              <UserAvatar
-                user={currentUser}
-                size="w-16 h-16"
-                textSize="text-xl"
-                className="border-2 border-white dark:border-surface"
-              />
-              <div className="absolute bottom-0 right-0 bg-primary rounded-full p-1 border-2 border-white dark:border-surface">
-                <PlusIcon className="h-4 w-4 text-white" />
+            <div className="relative">
+              <div className="p-1 rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600 group-hover/story:border-primary transition-colors duration-300">
+                <UserAvatar
+                  user={currentUser}
+                  size="w-16 h-16"
+                  textSize="text-2xl"
+                  className="border-2 border-white dark:border-surface"
+                />
+              </div>
+
+              {/* Floating Plus Icon */}
+              <div className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-1 border-[3px] border-white dark:border-surface shadow-sm group-hover/story:scale-110 transition-transform">
+                <PlusIcon className="h-3.5 w-3.5 stroke-2" />
               </div>
             </div>
-            <p className="text-xs w-20 truncate text-center text-gray-600 dark:text-text-secondary">
+            <p className="text-xs font-medium w-20 truncate text-center text-gray-700 dark:text-gray-300 group-hover/story:text-primary transition-colors">
               Your Story
             </p>
           </div>
@@ -107,25 +85,29 @@ const Stories = ({ onAddStoryClick, onViewStoryClick }) => {
             <div
               key={group.userId}
               onClick={() => onViewStoryClick(group)}
-              className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer group"
+              className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer group/story"
             >
-              <div className="bg-gradient-to-tr from-primary to-secondary p-0.5 rounded-full group-hover:scale-105 transition-transform">
-                <div className="bg-white dark:bg-background p-0.5 rounded-full">
-                  {/* User Avatar Component */}
-                  <StoryAvatar user={group} />
+              {/* Gradient Ring Wrapper */}
+              <div className="p-[3px] rounded-full bg-gradient-to-tr from-yellow-400 via-orange-500 to-fuchsia-600 group-hover/story:scale-105 transition-transform duration-300">
+                <div className="bg-white dark:bg-surface p-[2px] rounded-full">
+                  <UserAvatar
+                    user={group}
+                    size="w-16 h-16"
+                    textSize="text-2xl"
+                  />
                 </div>
               </div>
-              <p className="text-xs w-20 truncate text-center text-gray-600 dark:text-text-secondary">
+              <p className="text-xs font-medium w-20 truncate text-center text-gray-700 dark:text-gray-300 group-hover/story:text-primary transition-colors">
                 {group.username}
               </p>
             </div>
           ))}
         </div>
 
-        {/* Right Scroll Button */}
+        {/* Right Scroll Button (Glass Effect) */}
         <button
           onClick={() => scroll("right")}
-          className="absolute -right-4 z-10 bg-white/80 dark:bg-surface/80 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute -right-3 z-10 bg-white/90 dark:bg-surface/90 backdrop-blur-sm p-1.5 rounded-full shadow-md border border-gray-100 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 text-gray-700 dark:text-gray-300"
         >
           <ChevronRightIcon className="h-5 w-5" />
         </button>
