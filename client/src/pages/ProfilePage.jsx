@@ -6,7 +6,7 @@ import FeedSkeleton from "../components/FeedSkeleton";
 import { useAuth } from "../context/AuthContext";
 import EditProfileModal from "../components/EditProfileModal";
 import UserAvatar from "../components/UserAvatar";
-
+import FollowListModal from "../components/FollowListModal"; // 👈 Import the modal
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -17,6 +17,13 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showEditProfile, setShowEditProfile] = useState(false);
+
+  // 👇 New State for Follow Modal
+  const [followModal, setFollowModal] = useState({
+    isOpen: false,
+    title: "",
+    users: [],
+  });
 
   const isOwnProfile = loggedInUser?.username === username;
 
@@ -39,6 +46,24 @@ const ProfilePage = () => {
     fetchProfile();
   }, [username]);
 
+  // 👇 Function to handle clicking Followers/Following
+  const openFollowModal = async (type) => {
+    if (!profile?._id) return;
+    try {
+      // type should be "followers" or "following"
+      const endpoint = `/users/${profile._id}/${type}`;
+      const { data } = await api.get(endpoint);
+
+      setFollowModal({
+        isOpen: true,
+        title: type === "followers" ? "Followers" : "Following",
+        users: data,
+      });
+    } catch (error) {
+      console.error("Failed to fetch follow list", error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto pt-24 px-4">
@@ -59,21 +84,19 @@ const ProfilePage = () => {
     <div className="max-w-4xl mx-auto pt-24 px-4">
       {/* Profile Header */}
       <div className="flex flex-col sm:flex-row gap-8 items-center sm:items-start mb-10">
-        
         <div className="flex-shrink-0">
-           <UserAvatar 
-             user={profile} 
-             size="w-32 h-32" 
-             textSize="text-6xl"
-             className="border-4 border-white shadow-md"
-           />
+          <UserAvatar
+            user={profile}
+            size="w-32 h-32"
+            textSize="text-6xl"
+            className="border-4 border-white shadow-md"
+          />
         </div>
 
         {/* Info */}
         <div className="flex-1 text-center sm:text-left">
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <h2 className="text-2xl font-semibold">{profile.username}</h2>
-
             {isOwnProfile && (
               <button
                 onClick={() => setShowEditProfile(true)}
@@ -84,26 +107,35 @@ const ProfilePage = () => {
             )}
           </div>
 
-          {/* Stats */}
+          {/* Stats - NOW CLICKABLE */}
           <div className="flex justify-center sm:justify-start gap-6 mt-4">
             <div>
               <span className="font-semibold">{posts.length}</span> posts
             </div>
-            <div>
+
+            {/* 👇 CLICKABLE FOLLOWERS */}
+            <button
+              onClick={() => openFollowModal("followers")}
+              className="hover:underline cursor-pointer"
+            >
               <span className="font-semibold">
                 {profile.followers?.length || 0}
               </span>{" "}
               followers
-            </div>
-            <div>
+            </button>
+
+            {/* 👇 CLICKABLE FOLLOWING */}
+            <button
+              onClick={() => openFollowModal("following")}
+              className="hover:underline cursor-pointer"
+            >
               <span className="font-semibold">
                 {profile.following?.length || 0}
               </span>{" "}
               following
-            </div>
+            </button>
           </div>
 
-          {/* Bio */}
           {profile.bio && (
             <p className="mt-4 text-sm text-gray-700 whitespace-pre-line">
               {profile.bio}
@@ -122,6 +154,15 @@ const ProfilePage = () => {
           user={profile}
           onClose={() => setShowEditProfile(false)}
           onProfileUpdate={fetchProfile}
+        />
+      )}
+
+      {/* 👇 Render Follow List Modal */}
+      {followModal.isOpen && (
+        <FollowListModal
+          title={followModal.title}
+          users={followModal.users}
+          onClose={() => setFollowModal({ ...followModal, isOpen: false })}
         />
       )}
     </div>

@@ -6,7 +6,6 @@ import {
 } from "@heroicons/react/24/solid";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
-// 👇 Import the shared component (Make sure this path is correct)
 import UserAvatar from "./UserAvatar";
 
 const Stories = ({ onAddStoryClick, onViewStoryClick }) => {
@@ -43,7 +42,6 @@ const Stories = ({ onAddStoryClick, onViewStoryClick }) => {
       </h3>
 
       <div className="relative flex items-center">
-        {/* Left Scroll Button (Glass Effect) */}
         <button
           onClick={() => scroll("left")}
           className="absolute -left-3 z-10 bg-white/90 dark:bg-surface/90 backdrop-blur-sm p-1.5 rounded-full shadow-md border border-gray-100 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 text-gray-700 dark:text-gray-300"
@@ -55,7 +53,6 @@ const Stories = ({ onAddStoryClick, onViewStoryClick }) => {
           ref={scrollRef}
           className="flex space-x-5 overflow-x-auto scrollbar-hide scroll-smooth py-1 px-1"
         >
-          {/* Create Story (Current User) */}
           <div
             onClick={onAddStoryClick}
             className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer group/story"
@@ -70,7 +67,6 @@ const Stories = ({ onAddStoryClick, onViewStoryClick }) => {
                 />
               </div>
 
-              {/* Floating Plus Icon */}
               <div className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-1 border-[3px] border-white dark:border-surface shadow-sm group-hover/story:scale-110 transition-transform">
                 <PlusIcon className="h-3.5 w-3.5 stroke-2" />
               </div>

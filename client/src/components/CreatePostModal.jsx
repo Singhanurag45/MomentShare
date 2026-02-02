@@ -1,7 +1,7 @@
-// client/src/components/CreatePostModal.jsx
 import { useState } from "react";
 import { PhotoIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import api from "../services/api";
+import UserAvatar from "./UserAvatar"; // ✅ Import remains the same
 
 const CreatePostModal = ({ user, onClose }) => {
   const [caption, setCaption] = useState("");
@@ -14,12 +14,10 @@ const CreatePostModal = ({ user, onClose }) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       setFile(selectedFile);
-      // Create a preview URL for the selected image/video
       setPreview(URL.createObjectURL(selectedFile));
     }
   };
 
-  // This function converts the file to a Base64 string for sending
   const toBase64 = (file) =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -47,13 +45,9 @@ const CreatePostModal = ({ user, onClose }) => {
         mediaType,
       };
 
-      // ✨ The API call to your backend
       await api.post("/posts", payload);
-
-      // On success, close the modal
       onClose();
-      // You might want to refresh the feed here as well
-      window.location.reload(); // Simple way to refresh
+      window.location.reload();
     } catch (err) {
       console.error("Failed to create post:", err);
       setError("Failed to create post. The file might be too large.");
@@ -80,11 +74,11 @@ const CreatePostModal = ({ user, onClose }) => {
         <form onSubmit={handleSubmit}>
           <div className="p-4 space-y-4">
             <div className="flex items-center space-x-3">
-              <img
-                src={user.profilePicture}
-                alt={user.username}
-                className="w-10 h-10 rounded-full object-cover"
-              />
+              {/* 👇 FIXED: Replaced <img> with <UserAvatar /> */}
+              <div className="flex-shrink-0">
+                <UserAvatar user={user} size="w-10 h-10" textSize="text-sm" />
+              </div>
+
               <p className="font-semibold text-gray-800 dark:text-text-primary">
                 {user.username}
               </p>
@@ -95,11 +89,11 @@ const CreatePostModal = ({ user, onClose }) => {
               onChange={(e) => setCaption(e.target.value)}
               placeholder="Write a caption..."
               rows={3}
-              className="w-full bg-transparent text-lg outline-none text-gray-700 dark:text-text-primary placeholder-gray-400 dark:placeholder-text-secondary"
+              className="w-full bg-transparent text-lg outline-none text-gray-700 dark:text-text-primary placeholder-gray-400 dark:placeholder-text-secondary resize-none"
             />
 
             {preview ? (
-              <div className="w-full h-80 rounded-lg overflow-hidden">
+              <div className="w-full h-80 rounded-lg overflow-hidden relative group">
                 {file.type.startsWith("image") ? (
                   <img
                     src={preview}
@@ -113,11 +107,12 @@ const CreatePostModal = ({ user, onClose }) => {
                     className="w-full h-full object-cover"
                   />
                 )}
+                {/* Optional: Add a clear button here if you want */}
               </div>
             ) : (
-              <div className="w-full h-80 bg-gray-100 dark:bg-background border-2 border-dashed border-gray-300 dark:border-border rounded-lg flex flex-col justify-center items-center">
-                <PhotoIcon className="h-16 w-16 text-gray-400 dark:text-gray-600" />
-                <p className="text-gray-500 dark:text-text-secondary mt-2">
+              <div className="w-full h-80 bg-gray-50 dark:bg-background border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl flex flex-col justify-center items-center">
+                <PhotoIcon className="h-16 w-16 text-gray-300 dark:text-gray-600" />
+                <p className="text-gray-400 dark:text-gray-500 mt-2 font-medium">
                   Upload a photo or video
                 </p>
               </div>
@@ -130,23 +125,29 @@ const CreatePostModal = ({ user, onClose }) => {
               onChange={handleFileChange}
               className="hidden"
             />
-            <label
-              htmlFor="file-upload"
-              className="w-full text-center block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg cursor-pointer"
-            >
-              Select from computer
-            </label>
+
+            {/* Improved Button Styling */}
+            {!preview && (
+              <label
+                htmlFor="file-upload"
+                className="w-full text-center block bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-text-primary font-medium py-3 rounded-xl cursor-pointer transition-colors"
+              >
+                Select from computer
+              </label>
+            )}
 
             {error && (
-              <p className="text-red-500 text-sm text-center">{error}</p>
+              <p className="text-red-500 text-sm text-center font-medium bg-red-50 dark:bg-red-900/10 py-2 rounded-lg">
+                {error}
+              </p>
             )}
           </div>
+
           <div className="p-4 border-t dark:border-border">
             <button
               type="submit"
               disabled={isSubmitting || !file}
-              // ✨ CHANGE THIS LINE
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2.5 px-4 rounded-lg disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl disabled:bg-blue-300 dark:disabled:bg-blue-900/40 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md"
             >
               {isSubmitting ? "Sharing..." : "Share"}
             </button>

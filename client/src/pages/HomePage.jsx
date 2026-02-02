@@ -10,6 +10,7 @@ import CreatePostModal from "../components/CreatePostModal";
 import CreateStoryModal from "../components/CreateStoryModal";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
+import FeedSkeleton from "../components/FeedSkeleton";
 
 const HomePage = () => {
   const { user } = useAuth();
@@ -76,13 +77,12 @@ const HomePage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Feed Section */}
             <div className="lg:col-span-2 space-y-6">
-              {/* ❌ REMOVED <Stories /> COMPONENT FROM HERE */}
+              
 
               <div
-                // Remove the onClick here so clicking the background doesn't open the post modal
                 className="bg-white dark:bg-card rounded-xl shadow-sm"
               >
-                {/* 👇 PASS BOTH HANDLERS HERE */}
+       
                 <CreatePostPrompt
                   user={user}
                   onStoryClick={() => setIsStoryModalOpen(true)} // Opens Story Modal
@@ -99,7 +99,7 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-        <Footer />
+      
       </div>
     </>
   );

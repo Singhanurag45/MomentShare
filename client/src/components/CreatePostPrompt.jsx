@@ -34,9 +34,7 @@ const CreatePostPrompt = ({ user, onStoryClick, onPostClick }) => {
 
       <div className="h-px bg-gray-100 dark:bg-border mx-2" />
 
-      {/* Bottom Action Buttons */}
       <div className="grid grid-cols-4 gap-1 mt-3">
-        {/* 👇 1. STORY BUTTON (Triggers Story Modal) */}
         <button
           onClick={onStoryClick}
           className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-gray-600 dark:text-text-secondary hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors group"

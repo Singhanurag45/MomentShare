@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
+import UserAvatar from "./UserAvatar"; // 👈 Import the Avatar component
 
 import {
   HeartIcon as HeartOutline,
@@ -48,15 +49,16 @@ const PostCard = ({ post }) => {
   if (!post || !post.user) return null;
 
   return (
-    <div className="bg-white dark:bg-surface border dark:border-border rounded-xl shadow-sm overflow-hidden">
-
+    <div className="bg-white dark:bg-surface border dark:border-border rounded-xl shadow-sm overflow-hidden mb-6">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3">
         <Link to={`/${post.user.username}`}>
-          <img
-            src={post.user.profilePicture || "/default-avatar.png"}
-            alt={post.user.username}
-            className="w-10 h-10 rounded-full object-cover border"
+          {/* 👇 REPLACED <img> WITH UserAvatar */}
+          <UserAvatar
+            user={post.user}
+            size="w-10 h-10"
+            textSize="text-sm"
+            className="border"
           />
         </Link>
         <Link
@@ -67,25 +69,27 @@ const PostCard = ({ post }) => {
         </Link>
       </div>
 
-      {/* Media */}
-      <div className="bg-black">
-        {post.mediaType === "image" ? (
-          <img
-            src={post.mediaUrl}
-            alt="Post"
-            className="w-full max-h-[600px] object-cover"
-          />
-        ) : (
-          <video
-            src={post.mediaUrl}
-            controls
-            className="w-full max-h-[600px]"
-          />
-        )}
-      </div>
+      {/* Media - Conditional Rendering to prevent broken image icons */}
+      {post.mediaUrl && (
+        <div className="bg-black">
+          {post.mediaType === "image" ? (
+            <img
+              src={post.mediaUrl}
+              alt="Post"
+              className="w-full max-h-[600px] object-cover"
+            />
+          ) : (
+            <video
+              src={post.mediaUrl}
+              controls
+              className="w-full max-h-[600px]"
+            />
+          )}
+        </div>
+      )}
 
       {/* Actions */}
-      <div className="px-4 pt-3">
+      <div className="px-4 pt-3 pb-3">
         <div className="flex items-center gap-4">
           <button onClick={handleLike} aria-label="Like post">
             {isLiked ? (
@@ -104,17 +108,17 @@ const PostCard = ({ post }) => {
         </p>
 
         {/* Caption */}
-        <p className="text-sm mt-1">
-          <Link
-            to={`/${post.user.username}`}
-            className="font-semibold mr-2 dark:text-text-primary"
-          >
-            {post.user.username}
-          </Link>
-          <span className="dark:text-text-secondary">
-            {post.caption}
-          </span>
-        </p>
+        {post.caption && (
+          <p className="text-sm mt-1">
+            <Link
+              to={`/${post.user.username}`}
+              className="font-semibold mr-2 dark:text-text-primary"
+            >
+              {post.user.username}
+            </Link>
+            <span className="dark:text-text-secondary">{post.caption}</span>
+          </p>
+        )}
 
         {/* Comments */}
         <div className="mt-3 space-y-1 text-sm">
@@ -132,19 +136,14 @@ const PostCard = ({ post }) => {
               >
                 {comment.user.username}
               </Link>
-              <span className="dark:text-text-secondary">
-                {comment.text}
-              </span>
+              <span className="dark:text-text-secondary">{comment.text}</span>
             </p>
           ))}
         </div>
 
         {/* Add Comment */}
-        <div className="mt-3">
-          <AddComment
-            postId={post._id}
-            onCommentPosted={handleCommentPosted}
-          />
+        <div className="mt-3 border-t dark:border-gray-800 pt-3">
+          <AddComment postId={post._id} onCommentPosted={handleCommentPosted} />
         </div>
       </div>
     </div>

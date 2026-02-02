@@ -1,4 +1,3 @@
-// client/src/components/Suggestions.jsx
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import SuggestionItem from "./SuggestionItem.jsx";
@@ -9,7 +8,7 @@ const Suggestions = () => {
   useEffect(() => {
     const fetchSuggestions = async () => {
       try {
-        const { data } = await api.get("/users/suggestions"); // We need to create this endpoint
+        const { data } = await api.get("/users/suggestions");
         setSuggestions(data);
       } catch (error) {
         console.error("Failed to fetch suggestions:", error);
@@ -19,8 +18,12 @@ const Suggestions = () => {
   }, []);
 
   return (
-    <div className="bg-white border rounded-lg p-4 mt-6">
-      <h3 className="font-bold text-gray-700 mb-4">Suggestions For You</h3>
+    // 👇 Updated styles to match your HomePage design (Shadow, Borders, Dark Mode)
+    <div className="bg-white dark:bg-surface border border-gray-100 dark:border-border rounded-2xl p-4 mt-6 shadow-sm">
+      <h3 className="font-bold text-gray-700 dark:text-text-primary mb-4 text-sm">
+        Suggestions For You
+      </h3>
+
       {suggestions.length > 0 ? (
         <div className="space-y-4">
           {suggestions.map((user) => (
@@ -28,7 +31,9 @@ const Suggestions = () => {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-gray-400">No new suggestions right now.</p>
+        <p className="text-sm text-gray-400 text-center py-2">
+          No new suggestions right now.
+        </p>
       )}
     </div>
   );

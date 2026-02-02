@@ -10,17 +10,15 @@ const Layout = () => {
   const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // ✨ We create a "trigger" state. When a post is created, we'll change this value.
   const [refetchTrigger, setRefetchTrigger] = useState(0);
 
   const handlePostCreated = () => {
-    setIsModalOpen(false); // Close the modal
-    setRefetchTrigger((prev) => prev + 1); // ✨ Trigger a refetch in HomePage
+    setIsModalOpen(false); 
+    setRefetchTrigger((prev) => prev + 1); 
   };
 
   return (
     <>
-      {/* ✨ The Modal now lives here and is controlled by this component's state */}
       {isModalOpen && (
         <CreatePostModal
           user={user}
@@ -32,7 +30,6 @@ const Layout = () => {
       <div className="bg-gray-50 dark:bg-background min-h-screen">
         <Navbar onOpenCreatePostModal={() => setIsModalOpen(true)} />
         <main className="max-w-7xl mx-auto pt-20 px-4">
-          {/* ✨ We pass down the function to open the modal AND the refetch trigger */}
           <Outlet
             context={{
               openCreatePostModal: () => setIsModalOpen(true),
