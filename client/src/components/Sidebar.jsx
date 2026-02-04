@@ -36,8 +36,6 @@ const Sidebar = ({ user }) => {
         {/* Explore Tags */}
         <ExploreTags />
 
-        {/* Footer */}
-        <Footer />
       </div>
     </aside>
   );
