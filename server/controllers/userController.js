@@ -153,8 +153,6 @@ export const searchUsers = async (req, res) => {
   }
 };
 
-// ... (keep all existing imports and functions)
-
 // ✨ NEW: Function to get a user's followers
 export const getUserFollowers = async (req, res) => {
   try {
