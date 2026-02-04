@@ -23,8 +23,10 @@ const FollowListModal = ({ title, users, onClose }) => {
         <div className="flex-grow overflow-y-auto p-2">
           {users.length > 0 ? (
             users.map((user) => (
-              <div
+              <Link
                 key={user._id}
+                to={`/${user.username}`}
+                onClick={onClose}
                 className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
               >
                 <div className="flex items-center gap-3">
@@ -38,19 +40,15 @@ const FollowListModal = ({ title, users, onClose }) => {
                   </div>
 
                   <div>
-                    <Link
-                      to={`/${user.username}`}
-                      onClick={onClose}
-                      className="font-semibold text-sm hover:underline text-gray-900 dark:text-text-primary block"
-                    >
+                    <p className="font-semibold text-sm text-gray-900 dark:text-text-primary">
                       {user.username}
-                    </Link>
+                    </p>
                     <p className="text-xs text-gray-500 dark:text-text-secondary">
                       {user.fullName}
                     </p>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))
           ) : (
             <p className="text-center text-gray-500 p-8">No users to show.</p>
