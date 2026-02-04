@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import api from "../services/api";
+import UserAvatar from "./UserAvatar";
 
 // Helper function to convert an image file to a Base64 string for the API
 const toBase64 = (file) =>
@@ -75,11 +76,14 @@ const EditProfileModal = ({ user, onClose, onProfileUpdate }) => {
           <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
             {/* --- Profile Picture Section --- */}
             <div className="flex items-center space-x-6">
-              <img
+            <div className="flex-shrink-0">
+                     <UserAvatar user={user} size="w-14 h-14" textSize="text-xl" />
+                  </div>
+              {/* <img
                 src={preview}
                 alt="Profile"
                 className="w-20 h-20 rounded-full object-cover"
-              />
+              /> */}
               <div>
                 <p className="font-semibold text-lg">{user.username}</p>
                 <button

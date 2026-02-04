@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import UserAvatar from "./UserAvatar";
 
 const SearchBar = () => {
   const [query, setQuery] = useState("");
@@ -61,11 +62,10 @@ const SearchBar = () => {
                   onClick={handleResultClick}
                   className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
-                  <img
-                    src={user.profilePicture}
-                    alt={user.username}
-                    className="w-9 h-9 rounded-full object-cover"
-                  />
+                  <div className="flex-shrink-0">
+                     <UserAvatar user={user} size="w-14 h-14" textSize="text-xl" />
+                  </div>
+                 
                   <span className="font-semibold text-sm">{user.username}</span>
                 </Link>
               </li>
