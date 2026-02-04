@@ -6,6 +6,7 @@ import {
   likePost,
   commentOnPost,
   getPostById,
+  deletePost,
 } from "../controllers/postController.js";
 
 const router = express.Router();
@@ -15,5 +16,6 @@ router.get("/feed", authMiddleware, getFeedPosts);
 router.get("/:postId", authMiddleware, getPostById);
 router.put("/:id/like", authMiddleware, likePost);
 router.post("/:id/comment", authMiddleware, commentOnPost);
+router.delete("/:id", authMiddleware, deletePost);
 
 export default router;

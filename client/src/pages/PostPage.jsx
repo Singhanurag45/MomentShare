@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import PostCard from "../components/PostCard";
 import FeedSkeleton from "../components/FeedSkeleton";
 
 const PostPage = () => {
   const { postId } = useParams();
+  const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,7 +39,17 @@ const PostPage = () => {
 
   return (
     <div className="max-w-xl mx-auto py-8">
-      {post ? <PostCard post={post} /> : <p>Post not found.</p>}
+      {post ? (
+        <PostCard
+          post={post}
+          onDeleted={() => {
+            setPost(null);
+            navigate("/");
+          }}
+        />
+      ) : (
+        <p>Post not found.</p>
+      )}
     </div>
   );
 };

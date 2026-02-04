@@ -56,7 +56,13 @@ const HomePage = () => {
 
     // ✅ FIX ISSUE 1: Force unique keys by combining ID + Index
     return posts.map((post, index) => (
-      <PostCard key={`${post._id}-${index}`} post={post} />
+      <PostCard
+        key={`${post._id}-${index}`}
+        post={post}
+        onDeleted={(deletedId) =>
+          setPosts((prev) => prev.filter((p) => p._id !== deletedId))
+        }
+      />
     ));
   };
 

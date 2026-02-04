@@ -150,3 +150,28 @@ export const getPostById = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+// ✨ NEW: Delete a post (only by owner)
+export const deletePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+
+    // Only the owner of the post can delete it
+    if (post.user.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ msg: "Not authorized to delete this post" });
+    }
+
+    // Optionally remove related notifications
+    await Notification.deleteMany({ post: post._id });
+
+    await post.deleteOne();
+
+    res.json({ msg: "Post deleted successfully" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};

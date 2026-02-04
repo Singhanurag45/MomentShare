@@ -7,10 +7,10 @@ import {
   HeartIcon as HeartOutline,
   ChatBubbleOvalLeftIcon,
 } from "@heroicons/react/24/outline";
-import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
+import { HeartIcon as HeartSolid, TrashIcon } from "@heroicons/react/24/solid";
 import AddComment from "./AddComment";
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, onDeleted }) => {
   const { user: currentUser } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -41,25 +41,61 @@ const PostCard = ({ post }) => {
     setComments(updatedComments);
   };
 
+  const handleDelete = async () => {
+    if (!post || !currentUser) return;
+    const isOwner =
+      post.user._id?.toString?.() === currentUser._id ||
+      post.user === currentUser._id;
+    if (!isOwner) return;
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this post?",
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await api.delete(`/posts/${post._id}`);
+      if (onDeleted) onDeleted(post._id);
+    } catch (error) {
+      console.error("Failed to delete post:", error);
+      alert("Could not delete the post. Please try again.");
+    }
+  };
+
   if (!post || !post.user) return null;
 
   return (
     <div className="bg-white dark:bg-surface border dark:border-border rounded-xl shadow-sm overflow-hidden mb-6">
-      <div className="flex items-center gap-3 px-4 py-3">
-        <Link to={`/${post.user.username}`}>
-          <UserAvatar
-            user={post.user}
-            size="w-10 h-10"
-            textSize="text-sm"
-            className="border"
-          />
-        </Link>
-        <Link
-          to={`/${post.user.username}`}
-          className="font-semibold text-gray-900 dark:text-text-primary hover:underline"
-        >
-          {post.user.username}
-        </Link>
+      <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center gap-3">
+          <Link to={`/${post.user.username}`}>
+            <UserAvatar
+              user={post.user}
+              size="w-10 h-10"
+              textSize="text-sm"
+              className="border"
+            />
+          </Link>
+          <Link
+            to={`/${post.user.username}`}
+            className="font-semibold text-gray-900 dark:text-text-primary hover:underline"
+          >
+            {post.user.username}
+          </Link>
+        </div>
+
+        {/* Delete button only for owner */}
+        {currentUser &&
+          (post.user._id?.toString?.() === currentUser._id ||
+            post.user === currentUser._id) && (
+            <button
+              onClick={handleDelete}
+              className="text-red-500 hover:text-red-600 flex items-center gap-1 text-sm"
+            >
+              <TrashIcon className="w-4 h-4" />
+              Delete
+            </button>
+          )}
       </div>
 
       {post.mediaUrl && (
