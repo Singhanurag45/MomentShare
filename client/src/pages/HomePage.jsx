@@ -96,12 +96,6 @@ const HomePage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Feed Section */}
             <div className="lg:col-span-2 space-y-6">
-              <Stories
-                onAddStoryClick={() => setIsStoryModalOpen(true)}
-                // 👇 This now opens the viewer instead of console.log
-                onViewStoryClick={(group) => setViewingStoryGroup(group)}
-                refreshTrigger={storyRefetchTrigger}
-              />
 
               <div className="bg-white dark:bg-card rounded-xl shadow-sm">
                 <CreatePostPrompt
