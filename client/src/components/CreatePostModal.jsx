@@ -117,7 +117,9 @@ const CreatePostModal = ({ user, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center">
-      <div className="bg-white dark:bg-surface w-full max-w-lg rounded-2xl shadow-xl border border-gray-200 dark:border-border">
+ 
+      <div className="bg-white dark:bg-surface w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-xl border border-gray-200 dark:border-border">
+
         <div className="flex justify-between items-center p-4 border-b dark:border-border">
           <h2 className="text-xl font-bold text-gray-800 dark:text-text-primary">
             Create new post
@@ -189,7 +191,7 @@ const CreatePostModal = ({ user, onClose }) => {
             {!preview && (
               <label
                 htmlFor="file-upload"
-                className="w-full text-center block bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-text-primary font-medium py-3 rounded-xl cursor-pointer transition-colors"
+                className="w-full text-center block bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-white dark:text-text-primary font-medium py-3 rounded-xl cursor-pointer transition-colors"
               >
                 Select from computer
               </label>

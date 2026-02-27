@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { PhotoIcon, XMarkIcon } from "@heroicons/react/24/solid";
-// 👇 IMPORTANT: Must import from your services folder, NOT 'axios' directly
 import api from "../services/api";
 
 const toBase64 = (file) =>
