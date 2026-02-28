@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
@@ -15,6 +15,8 @@ const PostCard = ({ post, onDeleted }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [comments, setComments] = useState([]);
+  const [showLikeAnimation, setShowLikeAnimation] = useState(false);
+  const lastTapRef = useRef(0);
 
   useEffect(() => {
     if (post && currentUser) {
@@ -35,6 +37,23 @@ const PostCard = ({ post, onDeleted }) => {
       setIsLiked(prevLiked);
       setLikeCount(prevCount);
     }
+  };
+
+  const handleDoubleTap = (e) => {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTapRef.current;
+    
+    if (tapLength < 300 && tapLength > 0) {
+      // Double tap detected
+      if (!isLiked) {
+        handleLike();
+      }
+      // Show animation
+      setShowLikeAnimation(true);
+      setTimeout(() => setShowLikeAnimation(false), 1000);
+    }
+    
+    lastTapRef.current = currentTime;
   };
 
   const handleCommentPosted = (updatedComments) => {
@@ -99,7 +118,10 @@ const PostCard = ({ post, onDeleted }) => {
       </div>
 
       {post.mediaUrl && (
-        <div className="bg-black">
+        <div 
+          className="bg-black relative cursor-pointer select-none" 
+          onClick={handleDoubleTap}
+        >
           {post.mediaType === "image" ? (
             <img
               src={post.mediaUrl}
@@ -112,6 +134,11 @@ const PostCard = ({ post, onDeleted }) => {
               controls
               className="w-full max-h-[600px]"
             />
+          )}
+          {showLikeAnimation && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <HeartSolid className="w-24 h-24 text-white drop-shadow-lg animate-ping opacity-80" />
+            </div>
           )}
         </div>
       )}
