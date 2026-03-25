@@ -6,7 +6,7 @@ import FeedSkeleton from "../components/FeedSkeleton";
 import { useAuth } from "../context/AuthContext";
 import EditProfileModal from "../components/EditProfileModal";
 import UserAvatar from "../components/UserAvatar";
-import FollowListModal from "../components/FollowListModal"; // 👈 Import the modal
+import FollowListModal from "../components/FollowListModal";
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -19,7 +19,6 @@ const ProfilePage = () => {
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
 
-  // 👇 New State for Follow Modal
   const [followModal, setFollowModal] = useState({
     isOpen: false,
     title: "",
@@ -47,7 +46,6 @@ const ProfilePage = () => {
     fetchProfile();
   }, [username]);
 
-  // Determine if the logged-in user already follows this profile
   useEffect(() => {
     if (!profile || !loggedInUser) return;
     const followerIds = profile.followers || [];
@@ -57,7 +55,6 @@ const ProfilePage = () => {
 
   const handleFollowToggle = async () => {
     if (!profile?._id || !loggedInUser) return;
-
     try {
       if (isFollowing) {
         await api.put(`/users/${profile._id}/unfollow`);
@@ -81,14 +78,11 @@ const ProfilePage = () => {
     }
   };
 
-  // 👇 Function to handle clicking Followers/Following
   const openFollowModal = async (type) => {
     if (!profile?._id) return;
     try {
-      // type should be "followers" or "following"
       const endpoint = `/users/${profile._id}/${type}`;
       const { data } = await api.get(endpoint);
-
       setFollowModal({
         isOpen: true,
         title: type === "followers" ? "Followers" : "Following",
@@ -99,102 +93,128 @@ const ProfilePage = () => {
     }
   };
 
-  if (loading) {
+  if (loading)
     return (
-      <div className="max-w-4xl mx-auto pt-24 px-4">
+      <div className="max-w-4xl mx-auto pt-20 px-4">
         <FeedSkeleton />
       </div>
     );
-  }
-
-  if (error) {
+  if (error)
     return (
       <p className="text-center text-red-500 font-medium mt-32">{error}</p>
     );
-  }
-
   if (!profile) return null;
 
   return (
-    <div className="max-w-4xl mx-auto pt-24 px-4">
-      {/* Profile Header */}
-      <div className="flex flex-col sm:flex-row gap-8 items-center sm:items-start mb-10">
-        <div className="flex-shrink-0">
-          <UserAvatar
-            user={profile}
-            size="w-32 h-32"
-            textSize="text-6xl"
-            className="border-4 border-white shadow-md"
-          />
-        </div>
-
-        {/* Info */}
-        <div className="flex-1 text-center sm:text-left">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <h2 className="text-2xl font-semibold">{profile.username}</h2>
-            {isOwnProfile ? (
-              <button
-                onClick={() => setShowEditProfile(true)}
-                className="px-4 py-1.5 border rounded-md text-sm font-medium hover:bg-gray-100 transition"
-              >
-                Edit Profile
-              </button>
-            ) : (
-              <button
-                onClick={handleFollowToggle}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
-                  isFollowing
-                    ? "border bg-gray-100 hover:bg-gray-200"
-                    : "bg-blue-500 text-white hover:bg-blue-600"
-                }`}
-              >
-                {isFollowing ? "Unfollow" : "Follow"}
-              </button>
-            )}
+    <div className="max-w-4xl mx-auto pt-20 px-4 pb-12">
+      {/* --- Refined, Tighter Header Card --- */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8 mb-6">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center md:items-start">
+          {/* Avatar - Reduced to a professional scale */}
+          <div className="relative flex-shrink-0">
+            <div className="absolute -inset-1 bg-gradient-to-tr from-blue-400 to-indigo-500 rounded-full blur-sm opacity-20"></div>
+            <UserAvatar
+              user={profile}
+              size="w-24 h-24 md:w-28 md:h-28"
+              textSize="text-4xl"
+              className="relative border-4 border-white shadow-md"
+            />
           </div>
 
-          {/* Stats - NOW CLICKABLE */}
-          <div className="flex justify-center sm:justify-start gap-6 mt-4">
-            <div>
-              <span className="font-semibold">{posts.length}</span> posts
+          {/* User Info & Actions */}
+          <div className="flex-1 w-full">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-2 mb-4">
+              <div className="text-center md:text-left">
+                <h2 className="text-xl font-bold text-gray-900 tracking-tight">
+                  {profile.username}
+                </h2>
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                  {profile.fullName || "Member"}
+                </p>
+              </div>
+
+              <div className="flex gap-2">
+                {isOwnProfile ? (
+                  <button
+                    onClick={() => setShowEditProfile(true)}
+                    className="px-5 py-1.5 bg-gray-900 text-white rounded-lg text-xs font-bold hover:bg-black transition-all shadow-sm"
+                  >
+                    Edit Profile
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleFollowToggle}
+                    className={`px-6 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${
+                      isFollowing
+                        ? "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
+                  >
+                    {isFollowing ? "Following" : "Follow"}
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* 👇 CLICKABLE FOLLOWERS */}
-            <button
-              onClick={() => openFollowModal("followers")}
-              className="hover:underline cursor-pointer"
-            >
-              <span className="font-semibold">
-                {profile.followers?.length || 0}
-              </span>{" "}
-              followers
-            </button>
+            {/* Stats Bar - Compact Layout */}
+            <div className="flex justify-center md:justify-start gap-8 py-3 border-y border-gray-50 mb-4">
+              <div className="flex items-center gap-1.5">
+                <span className="text-base font-bold text-gray-900">
+                  {posts.length}
+                </span>
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                  Posts
+                </span>
+              </div>
 
-            {/* 👇 CLICKABLE FOLLOWING */}
-            <button
-              onClick={() => openFollowModal("following")}
-              className="hover:underline cursor-pointer"
-            >
-              <span className="font-semibold">
-                {profile.following?.length || 0}
-              </span>{" "}
-              following
-            </button>
+              <button
+                onClick={() => openFollowModal("followers")}
+                className="flex items-center gap-1.5 group hover:opacity-80 transition"
+              >
+                <span className="text-base font-bold text-gray-900 group-hover:text-blue-600">
+                  {profile.followers?.length || 0}
+                </span>
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest group-hover:text-blue-500">
+                  Followers
+                </span>
+              </button>
+
+              <button
+                onClick={() => openFollowModal("following")}
+                className="flex items-center gap-1.5 group hover:opacity-80 transition"
+              >
+                <span className="text-base font-bold text-gray-900 group-hover:text-blue-600">
+                  {profile.following?.length || 0}
+                </span>
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest group-hover:text-blue-500">
+                  Following
+                </span>
+              </button>
+            </div>
+
+            {/* Bio Section */}
+            {profile.bio && (
+              <div className="max-w-lg text-center md:text-left">
+                <p className="text-gray-600 text-[13px] leading-relaxed italic whitespace-pre-line">
+                  {profile.bio}
+                </p>
+              </div>
+            )}
           </div>
-
-          {profile.bio && (
-            <p className="mt-4 text-sm text-gray-700 whitespace-pre-line">
-              {profile.bio}
-            </p>
-          )}
         </div>
       </div>
 
-      <div className="border-t mb-6" />
+      {/* --- Section Tab Divider --- */}
+      <div className="flex justify-center border-b border-gray-100 mb-6">
+        <div className="px-6 py-2 border-b-2 border-gray-900 text-[10px] font-black uppercase tracking-[0.3em] text-gray-900">
+          Posts
+        </div>
+      </div>
 
+      {/* Grid Display */}
       <PostGrid posts={posts} />
 
-      {/* Edit Profile Modal */}
+      {/* Modals Container */}
       {showEditProfile && (
         <EditProfileModal
           user={profile}
@@ -203,7 +223,6 @@ const ProfilePage = () => {
         />
       )}
 
-      {/* 👇 Render Follow List Modal */}
       {followModal.isOpen && (
         <FollowListModal
           title={followModal.title}
